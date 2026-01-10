@@ -8,30 +8,33 @@ import model.Task;
 import model.TaskStatus;
 import model.User;
 import repository.TaskRepository;
+import repository.UserRepository;
 
 public class TaskService {
-    private final TaskRepository repository;
+    private final TaskRepository taskRepository;
+    private final UserRepository userRepository;
 
-    public TaskService(TaskRepository repository) {
-        this.repository = repository;
+    public TaskService(TaskRepository taskRepository, UserRepository userRepository) {
+        this.taskRepository = taskRepository;
+        this.userRepository = userRepository;
     }
 
     public Task createTask(String title) {
         Task task = new Task(title);
-        repository.save(task);
+        taskRepository.save(task);
         return task;
     }
 
     public List<Task> getAllTasks() {
-        return repository.List();
+        return taskRepository.List();
     }
 
     public void deleteTask(UUID id) {
-        repository.delete(id);
+        taskRepository.delete(id);
     }
 
-    public void assignUser(UUID id, User user) {
-        Task task = getTask(id);
+    public void assignUser(UUID taskId, User user) {
+        Task task = getTask(taskId);
         task.assignedUser(user);
     }
 
@@ -39,8 +42,8 @@ public class TaskService {
         Task task = getTask(id);
         task.setStatus(status);
     }
-    public List<Task> getTaskByStatus(TaskStatus status) {
-        return repository.List()
+    public List<Task> getTasksByStatus(TaskStatus status) {
+        return taskRepository.List()
         .stream()
         .filter(t -> t.getStatus() == status)
         .collect(Collectors.toList());
@@ -48,9 +51,26 @@ public class TaskService {
 
     private Task getTask(UUID id) {
         try {
-            return repository.findbyId(id);
+            return taskRepository.findbyId(id);
         } catch (Exception e) {
             throw new TaskNotFoundException("Task Id:" + id.toString() + "Not found!");
+        }
+    }
+
+    public User createUser(String name) {
+        User user = new User(name);
+        userRepository.save(user);
+        return user;
+    }
+
+    public List<User> getAllUsers() {
+        return userRepository.list();
+    }
+    public User getUser(UUID id) {
+        try {
+            return userRepository.getUserById(id);
+        } catch (Exception e) {
+            throw new TaskNotFoundException("User Id:" + id.toString() + "Not found!");
         }
     }
 }
