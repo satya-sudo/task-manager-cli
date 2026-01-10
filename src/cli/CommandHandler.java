@@ -4,14 +4,14 @@ import java.util.List;
 import java.util.Scanner;
 import java.util.UUID;
 import model.Task;
-import repository.TaskRepository;
+import service.TaskService;
 
 public class CommandHandler {
-    private final TaskRepository repository;
+    private final TaskService service;
     private final Scanner scanner = new Scanner(System.in);
 
-    public CommandHandler(TaskRepository repository) {
-        this.repository = repository;
+    public CommandHandler(TaskService service) {
+        this.service = service;
     }
 
     public void start() {
@@ -50,17 +50,16 @@ public class CommandHandler {
     private void createTask() {
         System.out.println("Enter Title:");
         String title = scanner.nextLine();  
-        Task task = new Task(title);
-        repository.save(task);
+        Task task = service.createTask(title);
         System.out.println("Task Created" + task.toString());
     }
 
     private void listTask() {
-        if (repository.List().isEmpty()) {
+        if (service.getAllTasks().isEmpty()) {
             System.out.println("No tasks present");
             return;
         }
-        List tasks = repository.List();
+        List tasks = service.getAllTasks();
         tasks.forEach(System.out::println);
     }
     private void  deleteTask() {
@@ -69,7 +68,7 @@ public class CommandHandler {
 
         try {
             UUID id = UUID.fromString(idStr);
-            repository.delete(id);
+            service.deleteTask(id);
             System.out.println("Task Deleted!");
         } catch (IllegalArgumentException e) {
             System.out.println("Invalid Id");

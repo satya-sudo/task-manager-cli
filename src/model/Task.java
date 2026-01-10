@@ -35,6 +35,10 @@ public class Task {
         this.assignedUser = user;
     }
 
+    public TaskStatus getStatus() {
+        return this.status;
+    }
+
     @Override
     public String toString() {
         return "Task{" +
